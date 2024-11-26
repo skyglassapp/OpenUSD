@@ -1011,6 +1011,20 @@ def InstallTBB_MacOS(context, force, buildArgs):
                   "ifeq ($(arch),$(filter $(arch),armv7 armv7s {0}))"
                         .format(apple_utils.GetTargetArmArch()))])
 
+        if context.buildTarget == apple_utils.TARGET_IOS_SIMULATOR:
+            shutil.copy(
+                src="build/ios.macos.inc",
+                dst="build/ios_simulator.macos.inc")
+
+            # iOS clang just reuses the macOS one,
+            # so it's easier to copy it directly.
+            shutil.copy(src="build/macos.clang.inc",
+                        dst="build/ios_simulator.clang.inc")
+
+            PatchFile("build/ios_simulator.clang.inc",
+                      [("ios","ios_simulator"),
+                       ("-miphoneos-version-min", "-mios-simulator-version-min")])
+
         if context.buildTarget == apple_utils.TARGET_VISIONOS:
             # Create visionOS config from iOS config
             shutil.copy(
